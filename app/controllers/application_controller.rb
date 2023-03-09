@@ -38,6 +38,14 @@ class ApplicationController < ActionController::API
     return { access_token: access_token, refresh_token: refresh_token }
   end
 
+  def find_post
+    begin
+      @post = Post.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => exception
+      render json: { error: exception.message }, status: :not_found
+    end
+  end
+
   def handle_missing_params(exception)
     render json: { ok: false, error: exception.message }, status: :bad_request
   end

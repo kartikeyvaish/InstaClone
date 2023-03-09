@@ -1,5 +1,5 @@
 class PostController < ApplicationController
-  before_action :authenticate_request
+  prepend_before_action :authenticate_request
   before_action :find_post, :validate_post_owner, only: [:show, :delete]
 
   def get_feed
@@ -52,14 +52,6 @@ class PostController < ApplicationController
   end
 
   private
-
-  def find_post
-    begin
-      @post = Post.find(params[:id])
-    rescue ActiveRecord::RecordNotFound => exception
-      render json: { error: exception.message }, status: :not_found
-    end
-  end
 
   def validate_post_owner
     unless @post.user_id == @current_user.id
