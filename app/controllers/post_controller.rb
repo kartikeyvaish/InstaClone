@@ -1,7 +1,7 @@
 class PostController < ApplicationController
   prepend_before_action :authenticate_request
-  before_action :find_post, :validate_post_owner, only: [:delete]
-  before_action :find_post, only: [:show]
+  before_action :find_post, only: [:show, :delete]
+  before_action :validate_post_owner, only: [:delete]
 
   def get_feed
     limit = params[:limit] || 10
