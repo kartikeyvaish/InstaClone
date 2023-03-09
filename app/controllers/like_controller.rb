@@ -6,7 +6,7 @@ class LikeController < ApplicationController
     limit = params[:limit] || 10
     offset = params[:offset] || 0
 
-    likes = Like.where(post_id: @post.id).limit(limit).offset(offset)
+    likes = Like.where(post_id: @post.id).limit(limit).offset(offset).order(created_at: :desc)
 
     cleaned_up_likes = likes.map do |like|
       get_like_details(like)
