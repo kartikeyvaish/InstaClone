@@ -7,7 +7,7 @@ class UserController < ApplicationController
     user = User.find_by(email: login_params[:email])
     password = login_params[:password]
 
-    if user == nil
+    if user.blank?
       return render json: { error: "Account with this Email does not exist." }, status: :not_found
     end
 
