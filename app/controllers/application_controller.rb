@@ -26,7 +26,7 @@ class ApplicationController < ActionController::API
   end
 
   def generate_tokens(user)
-    new_refresh_instance = Refreshtoken.new(user_id: user.id, is_used: false)
+    new_refresh_instance = RefreshToken.new(user_id: user.id, is_used: false)
 
     if !new_refresh_instance.save
       return render json: { errors: new_refresh_instance.errors.messages }, status: :bad_request

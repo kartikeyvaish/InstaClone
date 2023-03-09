@@ -20,14 +20,14 @@ class RefreshTokenController < ApplicationController
 
       decoded = decode(header)
 
-      refresh_token_instance = Refreshtoken.find(decoded["refresh_token_id"]) if decoded
+      refresh_token_instance = RefreshToken.find(decoded["refresh_token_id"]) if decoded
 
       if !refresh_token_instance
         return render json: { error: "Invalid Refresh Token" }, status: :unauthorized
       end
 
       if refresh_token_instance.is_used
-        Refreshtoken.where(user_id: refresh_token_instance.user_id).update_all(is_used: true)
+        RefreshToken.where(user_id: refresh_token_instance.user_id).update_all(is_used: true)
         return render json: { error: "Refresh Token already used." }, status: :unauthorized
       end
 
