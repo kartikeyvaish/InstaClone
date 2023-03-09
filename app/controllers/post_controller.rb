@@ -1,0 +1,58 @@
+class PostController < ApplicationController
+  before_action :authenticate_request
+
+  def get_own_posts
+    limit = params[:limit] || 10
+    offset = params[:offset] || 0
+
+    posts = Post.where(user_id: @current_user.id).limit(limit).offset(offset)
+
+    cleaned_up_posts = posts.map do |post|
+      get_post_details(post)
+    end
+
+    render json: { posts: cleaned_up_posts, message: "List of all posts by current user." }, status: :ok
+  end
+
+  def create
+    new_post = Post.new(new_post_params)
+    new_post.user_id = @current_user.id
+
+    if new_post.save
+      render json: { post: get_post_details(new_post), message: "Post created successfully." }, status: :ok
+    else
+      render json: { errors: new_post.errors.messages }, status: :bad_request
+    end
+  end
+
+  def show
+    post = Post.find(params[:id])
+
+    if post
+      render json: { post: get_post_details(post), message: "Post details." }, status: :ok
+    else
+      render json: { errors: post.errors.messages }, status: :bad_request
+    end
+  end
+
+  private
+
+  def new_post_params
+    params.require(:post).permit(:caption, :image, :location)
+  end
+
+  def get_post_details(post)
+    {
+      id: post[:id],
+      caption: post[:caption],
+      image: post[:image],
+      location: post[:location],
+      user_details: {
+        id: @current_user.id,
+        name: @current_user.name,
+      },
+      created_at: post[:created_at],
+      updated_at: post[:updated_at],
+    }
+  end
+end
