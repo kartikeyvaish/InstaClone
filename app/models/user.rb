@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :posts, dependent: :destroy
   has_many :refreshtokens, dependent: :destroy
+  has_many :likes, dependent: :destroy
 
   validates :email, presence: true, uniqueness: { case_sensitive: false }
   before_validation :downcase_email
