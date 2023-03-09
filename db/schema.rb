@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_09_104153) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_09_115847) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "comments", force: :cascade do |t|
+    t.string "body"
+    t.bigint "post_id", null: false
+    t.bigint "user_id", null: false
+    t.boolean "is_edited", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["post_id"], name: "index_comments_on_post_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
 
   create_table "likes", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -51,6 +62,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_09_104153) do
     t.index "lower((email)::text)", name: "index_users_on_lower_email", unique: true
   end
 
+  add_foreign_key "comments", "posts"
+  add_foreign_key "comments", "users"
   add_foreign_key "likes", "posts"
   add_foreign_key "likes", "users"
   add_foreign_key "posts", "users"
