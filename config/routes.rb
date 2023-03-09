@@ -4,9 +4,11 @@ Rails.application.routes.draw do
   post "/auth/signup", to: "user#signup"
 
   # Posts Routes
+  get "/posts/feed", to: "post#get_feed"
   get "/posts/me", to: "post#get_own_posts"
   post "/posts", to: "post#create"
   get "/posts/:id", to: "post#show"
+  delete "/posts/:id", to: "post#delete"
 
   # Tokens
   get "/token/refresh", to: "refresh_token#refresh_token"

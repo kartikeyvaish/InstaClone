@@ -1,5 +1,19 @@
 class PostController < ApplicationController
   before_action :authenticate_request
+  before_action :find_post, :validate_post_owner, only: [:show, :delete]
+
+  def get_feed
+    limit = params[:limit] || 10
+    offset = params[:offset] || 0
+
+    posts = Post.all.limit(limit).offset(offset)
+
+    cleaned_up_posts = posts.map do |post|
+      get_post_details(post)
+    end
+
+    render json: { posts: cleaned_up_posts, message: "List of all posts." }, status: :ok
+  end
 
   def get_own_posts
     limit = params[:limit] || 10
@@ -26,16 +40,32 @@ class PostController < ApplicationController
   end
 
   def show
-    post = Post.find(params[:id])
+    render json: { post: get_post_details(@post), message: "Post details." }, status: :ok
+  end
 
-    if post
-      render json: { post: get_post_details(post), message: "Post details." }, status: :ok
+  def delete
+    if @post.destroy
+      render json: { message: "Post deleted successfully." }, status: :ok
     else
-      render json: { errors: post.errors.messages }, status: :bad_request
+      render json: { errors: @post.errors.messages }, status: :bad_request
     end
   end
 
   private
+
+  def find_post
+    begin
+      @post = Post.find(params[:id])
+    rescue ActiveRecord::RecordNotFound => exception
+      render json: { error: exception.message }, status: :not_found
+    end
+  end
+
+  def validate_post_owner
+    unless @post.user_id == @current_user.id
+      render json: { error: "You are not authorized to perform this action." }, status: :unauthorized
+    end
+  end
 
   def new_post_params
     params.require(:post).permit(:caption, :image, :location)
