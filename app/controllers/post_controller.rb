@@ -1,12 +1,13 @@
 class PostController < ApplicationController
   prepend_before_action :authenticate_request
-  before_action :find_post, :validate_post_owner, only: [:show, :delete]
+  before_action :find_post, :validate_post_owner, only: [:delete]
+  before_action :find_post, only: [:show]
 
   def get_feed
     limit = params[:limit] || 10
     offset = params[:offset] || 0
 
-    posts = Post.all.limit(limit).offset(offset)
+    posts = Post.all.limit(limit).offset(offset).order(created_at: :desc)
 
     cleaned_up_posts = posts.map do |post|
       get_post_details(post)
@@ -19,7 +20,7 @@ class PostController < ApplicationController
     limit = params[:limit] || 10
     offset = params[:offset] || 0
 
-    posts = Post.where(user_id: @current_user.id).limit(limit).offset(offset)
+    posts = Post.where(user_id: @current_user.id).limit(limit).offset(offset).order(created_at: :desc)
 
     cleaned_up_posts = posts.map do |post|
       get_post_details(post)
@@ -70,9 +71,11 @@ class PostController < ApplicationController
       image: post[:image],
       location: post[:location],
       user_details: {
-        id: @current_user.id,
-        name: @current_user.name,
+        id: post.user[:id],
+        name: post.user[:name],
       },
+      likes_count: post.likes.count,
+      is_liked: post.likes.where(user_id: @current_user.id).present?,
       created_at: post[:created_at],
       updated_at: post[:updated_at],
     }
