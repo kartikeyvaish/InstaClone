@@ -9,7 +9,7 @@ class LikeController < ApplicationController
     likes = Like.where(post_id: @post.id).limit(limit).offset(offset).order(created_at: :desc)
 
     cleaned_up_likes = likes.map do |like|
-      get_like_details(like)
+      like.as_json
     end
 
     render json: { likes: cleaned_up_likes, message: "List of all likes on post." }, status: :ok
@@ -17,7 +17,7 @@ class LikeController < ApplicationController
 
   def like_a_post
     if @is_liked
-      return render json: { message: "You have already liked this post." }, status: :bad_request
+      return render json: { is_liked: true, message: "You have already liked this post." }, status: :bad_request
     end
 
     new_like = Like.new
@@ -33,7 +33,7 @@ class LikeController < ApplicationController
 
   def unlike_a_post
     unless @is_liked
-      return render json: { message: "You have not liked this post yet." }, status: :bad_request
+      return render json: { is_liked: false, message: "You have not liked this post yet." }, status: :bad_request
     end
 
     like = Like.where(user_id: @current_user.id, post_id: @post.id).first
@@ -50,16 +50,6 @@ class LikeController < ApplicationController
   end
 
   private
-
-  def get_like_details(like)
-    {
-      id: like.id,
-      user: {
-        id: like.user.id,
-        name: like.user.name,
-      },
-    }
-  end
 
   def like_exists
     if Like.where(user_id: @current_user.id, post_id: @post.id).exists?
