@@ -23,4 +23,5 @@ Rails.application.routes.draw do
 
   # Tokens
   get "/token/refresh", to: "refresh_token#refresh_token"
+  post "/token/refresh/invalidate", to: "refresh_token#invalidate_expired_tokens"
 end

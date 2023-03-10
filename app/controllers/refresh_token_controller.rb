@@ -1,10 +1,16 @@
 class RefreshTokenController < ApplicationController
-  before_action :authenticate_refresh_request
+  before_action :authenticate_refresh_request, only: [:refresh_token]
+  before_action :authenticate_request, only: [:invalidate_expired_tokens]
 
   def refresh_token
     response_payload = generate_tokens(@current_user).merge({ message: "Token Refreshed Successfully" })
 
     render json: response_payload, status: :ok
+  end
+
+  def invalidate_expired_tokens
+    RefreshToken.where("created_at < ?", 5.hours.ago).delete_all
+    render json: { message: "All Refresh Tokens Invalidated" }, status: :ok
   end
 
   private
