@@ -12,7 +12,7 @@ class CommentController < ApplicationController
     comments = Comment.where(post_id: @post.id).limit(limit).offset(offset).order(created_at: :desc)
 
     cleaned_comments = comments.map do |comment_item|
-      get_comment_details(comment_item)
+      comment_item.as_json
     end
 
     render json: { comments: cleaned_comments, message: "List of all comments on post." }, status: :ok
@@ -26,7 +26,7 @@ class CommentController < ApplicationController
     )
 
     if comment.save
-      render json: get_comment_details(comment), status: :ok
+      render json: comment.as_json, status: :ok
     else
       render json: { errors: comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -45,7 +45,7 @@ class CommentController < ApplicationController
     @comment.is_edited = true
 
     if @comment.save
-      render json: get_comment_details(@comment), status: :ok
+      render json: @comment.as_json, status: :ok
     else
       render json: { errors: @comment.errors.full_messages }, status: :unprocessable_entity
     end
@@ -71,16 +71,5 @@ class CommentController < ApplicationController
     unless @comment.user_id == @current_user.id || @comment.post.user_id == @current_user.id
       render json: { message: "You are not authorized to delete this comment" }, status: :unauthorized
     end
-  end
-
-  def get_comment_details(comment)
-    {
-      id: comment.id,
-      user_details: comment.user.as_json,
-      content: comment.body,
-      edited: comment.is_edited,
-      created_at: comment.created_at,
-      updated_at: comment.updated_at,
-    }
   end
 end
