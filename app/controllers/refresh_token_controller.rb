@@ -1,6 +1,7 @@
 class RefreshTokenController < ApplicationController
   before_action :authenticate_refresh_request, only: [:refresh_token]
   before_action :authenticate_request, only: [:invalidate_expired_tokens]
+  before_action :is_admin, only: [:invalidate_expired_tokens]
 
   def refresh_token
     response_payload = generate_tokens(@current_user).merge({ message: "Token Refreshed Successfully" })
@@ -50,6 +51,12 @@ class RefreshTokenController < ApplicationController
       end
     rescue JWT::ExpiredSignature
       render json: { error: "Refresh Token Expired" }, status: :unauthorized
+    end
+  end
+
+  def is_admin
+    if !@current_user.admin
+      return render json: { error: "You are not an admin" }, status: :unauthorized
     end
   end
 end
