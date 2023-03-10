@@ -2,7 +2,7 @@ class User < ApplicationRecord
   has_secure_password
 
   has_many :posts, dependent: :destroy
-  has_many :refreshtokens, dependent: :destroy
+  has_many :refresh_tokens, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_many :comments, dependent: :destroy
 
@@ -14,6 +14,6 @@ class User < ApplicationRecord
   end
 
   def as_json(options = {})
-    super(options.merge({ except: [:email, :password_digest, :created_at, :updated_at] }))
+    super(options.merge({ except: [:email, :admin, :password_digest, :created_at, :updated_at] }))
   end
 end
