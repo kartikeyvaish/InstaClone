@@ -25,9 +25,9 @@ class LikeController < ApplicationController
     new_like.post_id = @post.id
 
     if new_like.save
-      render json: { like: get_like_details(new_like), message: "Post liked successfully." }, status: :ok
+      render json: { is_liked: true, message: "Post liked successfully." }, status: :ok
     else
-      render json: { errors: new_like.errors.messages }, status: :bad_request
+      render json: { is_liked: false, errors: new_like.errors.messages }, status: :bad_request
     end
   end
 
@@ -38,10 +38,14 @@ class LikeController < ApplicationController
 
     like = Like.where(user_id: @current_user.id, post_id: @post.id).first
 
+    if like.blank?
+      return render json: { is_liked: false, message: "Like not found." }, status: :not_found
+    end
+
     if like.destroy
-      render json: { message: "Post unliked successfully." }, status: :ok
+      render json: { is_liked: false, message: "Post unliked successfully." }, status: :ok
     else
-      render json: { errors: like.errors.messages }, status: :bad_request
+      render json: { is_liked: true, errors: like.errors.messages }, status: :bad_request
     end
   end
 
