@@ -10,7 +10,7 @@ class RefreshTokenController < ApplicationController
   end
 
   def invalidate_expired_tokens
-    RefreshToken.where("created_at < ?", 5.hours.ago).delete_all
+    RefreshToken.where("created_at < ?", 1.week.ago).delete_all
     render json: { message: "All Refresh Tokens Invalidated" }, status: :ok
   end
 
