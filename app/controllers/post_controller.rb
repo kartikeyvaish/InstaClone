@@ -65,19 +65,7 @@ class PostController < ApplicationController
   end
 
   def get_post_details(post)
-    {
-      id: post[:id],
-      caption: post[:caption],
-      image: post[:image],
-      location: post[:location],
-      user_details: {
-        id: post.user[:id],
-        name: post.user[:name],
-      },
-      likes_count: post.likes.count,
-      is_liked: post.likes.where(user_id: @current_user.id).present?,
-      created_at: post[:created_at],
-      updated_at: post[:updated_at],
-    }
+    is_liked = post.likes.where(user_id: @current_user.id).present?
+    post.as_json.merge({ is_liked: is_liked })
   end
 end
