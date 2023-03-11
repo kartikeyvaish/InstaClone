@@ -1,0 +1,5 @@
+class ChangeTableNameFromRefreshtokenToRefreshToken < ActiveRecord::Migration[7.0]
+  def change
+    rename_table :refreshtokens, :refresh_tokens
+  end
+end
